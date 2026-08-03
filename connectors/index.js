@@ -1,4 +1,4 @@
-const shopify = require('./shopify/products');
+const shopify = require('./shopify');
 
 const connectors = {
   shopify
