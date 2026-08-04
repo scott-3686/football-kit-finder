@@ -1,19 +1,20 @@
+const Product = require('../../models/product');
+
 const {
   normaliseCategory,
   normaliseAgeGroup
 } = require('../../utils/normaliseProduct');
 
-function sleep(ms) {
-  return new Promise(resolve => setTimeout(resolve, ms));
-}
-
-const Product = require('../../models/product');
 const { extractPrice } = require('../../utils/pricing');
+
 const {
-  getAgeGroup,
   isExcludedProduct,
   extractSizes
 } = require('../../utils/product');
+
+function sleep(ms) {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
 
 async function scrapeProducts(source) {
 
@@ -49,12 +50,6 @@ if (!response.ok) {
 }
 
 
-  if (!response.ok) {
-    throw new Error(
-      `Shopify request failed (${response.status})`
-    );
-  }
-
   const data = await response.json();
 
   return data.products
@@ -65,7 +60,7 @@ if (!response.ok) {
       team: source.name,
       title: product.title,
       category: normaliseCategory(product.title),
-ageGroup: normaliseAgeGroup(product.title),
+      ageGroup: normaliseAgeGroup(product.title),
       price: extractPrice(product),
       url: `${source.url}/products/${product.handle}`,
       image: product.images?.[0]?.src || null,
