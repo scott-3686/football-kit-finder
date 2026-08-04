@@ -10,7 +10,10 @@ class Product {
     image,
     sizes,
     variants,
-    source
+    source,
+    kitType,
+    productCategory,
+    ageRange
   }) {
     this.team = team;
     this.title = title;
@@ -23,6 +26,9 @@ class Product {
     this.sizes = sizes;
     this.variants = variants;
     this.source = source;
+    this.kitType = kitType;
+    this.productCategory = productCategory;
+    this.ageRange = ageRange
   }
 }
 

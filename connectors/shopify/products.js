@@ -1,9 +1,11 @@
 const Product = require('../../models/product');
 
 const {
-  normaliseCategory,
-  normaliseAgeGroup
-} = require('../../utils/normaliseProduct');
+  getKitType,
+  getProductCategory,
+  getAgeRange,
+  getVariantAgeRange
+} = require('../../utils/classifier');
 
 const { extractPrice } = require('../../utils/pricing');
 
@@ -59,8 +61,11 @@ if (!response.ok) {
     return new Product({
       team: source.name,
       title: product.title,
-      category: normaliseCategory(product.title),
-      ageGroup: normaliseAgeGroup(product.title),
+      kitType: getKitType(product.title),
+      productCategory: getProductCategory(product.title),
+      ageRange:
+        getVariantAgeRange(product.variants) ||
+        getAgeRange(product.title),
       price: extractPrice(product),
       url: `${source.url}/products/${product.handle}`,
       image: product.images?.[0]?.src || null,
