@@ -1,61 +1,51 @@
-const puppeteer = require('puppeteer');
 const Product = require('../../models/product');
 
 async function scrapeProducts(source) {
 
   console.log(`Fetching Shopify products for ${source.name}`);
 
-  const browser = await puppeteer.launch({
-    headless: true
-  });
-
-  const page = await browser.newPage();
-
-  await page.goto(
-    `${source.url}/collections/all`,
-    {
-      waitUntil: 'networkidle2'
-    }
+  const response = await fetch(
+    `${source.url}/products.json`
   );
 
-  const products = await page.evaluate(() => {
-
-    const cards = Array.from(
-      document.querySelectorAll('a[href*="/products/"]')
+  if (!response.ok) {
+    throw new Error(
+      `Shopify request failed (${response.status})`
     );
+  }
 
-    return cards.map(card => {
+  const data = await response.json();
 
-      const text = card.innerText
-        .replace(/\s+/g, ' ')
-        .trim();
+  return data.products
+    .filter(product => {
+      const title = product.title.toLowerCase();
 
-      const price = text.match(/£\d+\.\d+/);
+      return !title.includes('gift card');
+    })
+    .map(product => {
 
-      return {
-        name: text
-          .replace(/£\d+\.\d+/g, '')
-          .trim(),
+      const variant = product.variants?.[0];
 
-        price: price ? price[0] : null,
+      return new Product({
+        team: source.name,
+        title: product.title,
+        category: product.product_type || null,
+        ageGroup: product.tags?.includes('Junior')
+          ? 'junior'
+          : null,
+        price: variant
+          ? Number(variant.price)
+          : null,
+        url: `${source.url}/products/${product.handle}`,
+        image: product.images?.[0]?.src || null,
+        sizes: product.variants?.map(v => v.title) || [],
+        source: source.platform
+      });
 
-        url: card.href,
-
-        image: card.querySelector('img')?.src || null
-      };
-
-    }).filter(product => product.name);
-
-  });
-
-  await browser.close();
-
-  return products.map(product => new Product({
-    ...product,
-    club: source.name,
-    source: source.platform
-  }));
+    });
 
 }
 
-module.exports = scrapeProducts;
+module.exports = {
+  scrape: scrapeProducts
+};

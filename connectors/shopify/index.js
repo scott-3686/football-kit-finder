@@ -1,5 +1,3 @@
-const scrapeProducts = require('./products');
+const products = require('./products');
 
-module.exports = {
-  scrape: scrapeProducts
-};
+module.exports = products;
