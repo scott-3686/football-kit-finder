@@ -1,7 +1,9 @@
 const shopify = require('./shopify');
+const afc = require('./afc');
 
 const connectors = {
-  shopify
+  shopify,
+  afc
 };
 
 function getConnector(platform) {

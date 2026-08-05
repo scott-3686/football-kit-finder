@@ -1,9 +1,12 @@
 [
   {
     "name": "St Mirren",
-    "league": "Scottish Premiership",
-    "country": "Scotland",
     "platform": "shopify",
     "url": "https://www.stmirrendirect.co.uk"
+  },
+  {
+    "name": "Aberdeen",
+    "platform": "afc",
+    "url": "https://shop.afc.co.uk"
   }
 ]
