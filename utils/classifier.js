@@ -134,3 +134,36 @@ module.exports = {
   getAgeRange,
   getVariantAgeRange
 };
+function getAgeGroup(title, variants = []) {
+
+  const text = title.toLowerCase();
+
+  if (
+    text.includes('jnr') ||
+    text.includes('junior') ||
+    text.includes('kids') ||
+    text.includes('youth')
+  ) {
+    return 'junior';
+  }
+
+  const hasJuniorSizes = variants.some(v =>
+    ['3xs', 'xxs', 'xs'].some(size =>
+      v.title.toLowerCase().includes(size)
+    )
+  );
+
+  if (hasJuniorSizes) {
+    return 'junior';
+  }
+
+  return 'adult';
+}
+
+module.exports = {
+  getKitType,
+  getProductCategory,
+  getAgeRange,
+  getVariantAgeRange,
+  getAgeGroup
+};

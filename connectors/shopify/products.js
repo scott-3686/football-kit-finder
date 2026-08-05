@@ -4,7 +4,8 @@ const {
   getKitType,
   getProductCategory,
   getAgeRange,
-  getVariantAgeRange
+  getVariantAgeRange,
+  getAgeGroup
 } = require('../../utils/classifier');
 
 const { extractPrice } = require('../../utils/pricing');
@@ -58,22 +59,30 @@ if (!response.ok) {
   .filter(product => !isExcludedProduct(product))
   .map(product => {
 
-    return new Product({
-      team: source.name,
-      title: product.title,
-      kitType: getKitType(product.title),
-      productCategory: getProductCategory(product.title),
-      ageRange:
-        getVariantAgeRange(product.variants) ||
-        getAgeRange(product.title),
-      price: extractPrice(product),
-      url: `${source.url}/products/${product.handle}`,
-      image: product.images?.[0]?.src || null,
-      sizes: extractSizes(product),
-      source: source.platform
-    });
+    const ageRange =
+  getVariantAgeRange(product.variants) ||
+  getAgeRange(product.title);
 
-  });
+console.log(product.title, ageRange);
+
+    return new Product({
+  team: source.name,
+  title: product.title,
+  kitType: getKitType(product.title),
+  productCategory: getProductCategory(product.title),
+  ageRange,
+  ageGroup: getAgeGroup(
+    product.title,
+    product.variants
+  ),
+  price: extractPrice(product),
+  url: `${source.url}/products/${product.handle}`,
+  image: product.images?.[0]?.src || null,
+  sizes: extractSizes(product),
+  source: source.platform
+});
+
+});
 
 }
 
