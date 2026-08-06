@@ -1,32 +1,27 @@
-const Product = require('../../models/product');
-
-const {
-  getKitType,
-  getProductCategory,
-  getAgeRange
-} = require('../../utils/classifier');
-
-
 const LISTINGS = [
   {
+    category: "Home Kit",
     id: 8,
-    subid: 11
+    subids: [11, 12]
   },
   {
+    category: "Away Kit",
     id: 26,
-    subid: 100
+    subids: [100, 101, 345]
   },
   {
-    id: 20,
-    subid: ""
+    category: "Goalkeeper Kit",
+    id: 19,
+    subids: [52, 53]
   }
 ];
 
-async function fetchListing(listing) {
+
+async function fetchListing(id, subid = "") {
 
   const body =
-    `id=${listing.id}` +
-    `&subid=${listing.subid}` +
+    `id=${id}` +
+    `&subid=${subid}` +
     `&star_shirt=Y` +
     `&display_oos=N` +
     `&websales_brch=300` +
@@ -34,64 +29,124 @@ async function fetchListing(listing) {
     `&quickview=Y` +
     `&start=0`;
 
+
   const response = await fetch(
     "https://shop.afc.co.uk/api/product/catalogue/list/getdetails.php",
     {
       method: "POST",
       headers: {
-        "Content-Type":
-          "application/x-www-form-urlencoded"
+        "Content-Type": "application/x-www-form-urlencoded"
       },
       body
     }
   );
 
-  return response.json();
+
+  const text = await response.text();
+
+
+  if (!text.startsWith("{")) {
+    console.log("Skipping invalid AFC response");
+    return null;
+  }
+
+
+  return JSON.parse(text);
+
 }
 
-async function scrapeProducts(source) {
+
+
+function mapProduct(product, category) {
+
+  const name = product.title || product.altText || "";
+
+  let productType = "Other";
+
+  if (name.toLowerCase().includes("jersey")) {
+    productType = "Jersey";
+  } else if (name.toLowerCase().includes("short")) {
+    productType = "Shorts";
+  } else if (name.toLowerCase().includes("sock")) {
+    productType = "Socks";
+  }
+
+
+  let ageGroup = "Unknown";
+
+  if (name.toLowerCase().includes("adult")) {
+    ageGroup = "Adult";
+  } else if (name.toLowerCase().includes("youth")) {
+    ageGroup = "Youth";
+  } else if (name.toLowerCase().includes("baby") || name.toLowerCase().includes("infant")) {
+    ageGroup = "Baby / Infant";
+  }
+
+
+  const sizes = (product.item_catalogue || [])
+    .map(item => item.label)
+    .filter(Boolean);
+
+
+  return {
+    club: "Aberdeen FC",
+    season: name.substring(0, 4),
+    kit: category,
+    product: productType,
+    age_group: ageGroup,
+    name,
+    price: Number(product.price?.rrp || 0),
+    sizes: [...new Set(sizes)],
+    url: product.link
+  };
+
+}
+
+
+
+async function scrape() {
 
   const products = [];
 
+
   for (const listing of LISTINGS) {
 
-    const data = await fetchListing(listing);
+    for (const subid of listing.subids) {
 
-    for (const product of data.results.docs) {
-
-      products.push(
-        mapProduct(product, source)
+      console.log(
+        `Fetching AFC ${listing.category} ${subid}`
       );
+
+
+      const data = await fetchListing(
+        listing.id,
+        subid
+      );
+
+
+      if (!data?.results?.docs) {
+        continue;
+      }
+
+
+      for (const product of data.results.docs) {
+
+        products.push(
+          mapProduct(product, listing.category)
+        );
+
+      }
 
     }
 
   }
 
+
   return products;
-}
-
-
-function mapProduct(product, source) {
-
-  return new Product({
-    team: source.name,
-    title: product.title,
-    category: product.main_category || 'other',
-    price: Number(product.price.rrp),
-    currency: 'GBP',
-    url: product.link,
-    image: null,
-    sizes: product.item_catalogue
-      ? product.item_catalogue.map(item => item.label)
-      : [],
-    source: source.platform,
-    kitType: getKitType(product.title),
-    productCategory: getProductCategory(product.title),
-    ageRange: getAgeRange(product.title)
-  });
 
 }
+
 
 module.exports = {
-  scrape: scrapeProducts
+  scrape
 };
