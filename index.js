@@ -24,6 +24,9 @@ async function run() {
     const products = await connector.scrape(source);
 
     console.log(`${source.name}: ${products.length} products found`);
+    console.log(
+    products.slice(0,3).map(p => ` - ${p.title}`).join('\n')
+    );
 
     const filename =
       source.name

@@ -63,7 +63,7 @@ if (!response.ok) {
   getVariantAgeRange(product.variants) ||
   getAgeRange(product.title);
 
-console.log(product.title, ageRange);
+
 
     return new Product({
   team: source.name,
