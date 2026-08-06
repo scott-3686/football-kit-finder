@@ -17,3 +17,15 @@ An aggregator to help parents find affordable children's football kits across UK
 - Natural language search
 - Affiliate links
 - Mobile app
+
+# Football Kit Aggregator
+
+Currently supported:
+- St Mirren (Shopify)
+- Aberdeen (AFC platform)
+
+Run:
+node index.js
+
+Output:
+output/*.json
