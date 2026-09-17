@@ -6,7 +6,11 @@ function normaliseProduct(product = {}) {
     "";
 
   return {
-    club: product.club || product.source || "Unknown",
+    club:
+      product.club ||
+      product.team ||
+      product.source ||
+      "Unknown",
 
     name,
 
@@ -84,7 +88,6 @@ function extractProductType(name = "") {
 
   const text = name.toLowerCase();
 
-  // Bundles first - these are actual complete kits
   if (
     text.includes("mini kit") ||
     text.includes("infant kit") ||
@@ -97,7 +100,6 @@ function extractProductType(name = "") {
     return "Full Kit";
   }
 
-  // Individual items
   if (
     text.includes("jersey") ||
     text.includes("shirt") ||
@@ -134,7 +136,6 @@ function extractAgeGroup(product = {}, name = "") {
     ).toLowerCase();
 
 
-  // Baby / Infant
   if (
     text.includes("baby") ||
     text.includes("infant") ||
@@ -144,7 +145,6 @@ function extractAgeGroup(product = {}, name = "") {
   }
 
 
-  // Youth / Junior
   if (
     text.includes("youth") ||
     text.includes("junior") ||
@@ -155,7 +155,6 @@ function extractAgeGroup(product = {}, name = "") {
   }
 
 
-  // Sock size ranges are a useful AFC clue
   if (
     sizes.includes("10.5") ||
     sizes.includes("2.5") ||
