@@ -5,6 +5,9 @@ function normaliseProduct(product = {}) {
     product.title ||
     "";
 
+  const sizes =
+    normaliseSizes(product.sizes || []);
+
   return {
     club:
       product.club ||
@@ -30,14 +33,16 @@ function normaliseProduct(product = {}) {
       product.age_group ||
       extractAgeGroup(product, name),
 
+    age_range:
+      extractAgeRange(sizes),
+
     size_type:
       product.size_type || null,
 
     price:
       Number(product.price || 0),
 
-    sizes:
-      normaliseSizes(product.sizes || []),
+    sizes,
 
     url:
       product.url || null
@@ -58,14 +63,10 @@ function normaliseSizes(sizes = []) {
         return null;
       }
 
-      // Shopify sometimes returns colour without a real size
       if (value.toLowerCase() === "no colour") {
         return null;
       }
 
-      // Shopify variant format:
-      // "Black / M" -> "M"
-      // "No Colour / ONE-SIZE" -> "ONE-SIZE"
       if (value.includes(" / ")) {
 
         const parts =
@@ -76,11 +77,6 @@ function normaliseSizes(sizes = []) {
         ].trim();
       }
 
-      // AFC sizes such as:
-      // 1/2Y
-      // 5/6Y
-      // YM
-      // 10.5 - 2
       return value;
 
     })
@@ -88,6 +84,63 @@ function normaliseSizes(sizes = []) {
 
 
   return [...new Set(cleaned)];
+
+}
+
+
+function extractAgeRange(sizes = []) {
+
+  const ranges = [];
+
+
+  for (const size of sizes) {
+
+    const value =
+      String(size)
+        .trim()
+        .toUpperCase();
+
+
+    // Months: 3/6M, 6/9M, 9/12M
+    const monthMatch =
+      value.match(/^(\d+)\s*\/\s*(\d+)M$/);
+
+    if (monthMatch) {
+      ranges.push({
+        min: Number(monthMatch[1]),
+        max: Number(monthMatch[2])
+      });
+
+      continue;
+    }
+
+
+    // Years: 1/2Y, 3/4Y, 5/6Y
+    const yearMatch =
+      value.match(/^(\d+)\s*\/\s*(\d+)Y$/);
+
+    if (yearMatch) {
+      ranges.push({
+        min: Number(yearMatch[1]) * 12,
+        max: Number(yearMatch[2]) * 12
+      });
+    }
+
+  }
+
+
+  if (!ranges.length) {
+    return null;
+  }
+
+
+  return {
+    min_months:
+      Math.min(...ranges.map(range => range.min)),
+
+    max_months:
+      Math.max(...ranges.map(range => range.max))
+  };
 
 }
 
