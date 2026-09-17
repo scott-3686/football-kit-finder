@@ -33,10 +33,11 @@ function normaliseProduct(product = {}) {
     size_type:
       product.size_type || null,
 
-    price: Number(product.price || 0),
+    price:
+      Number(product.price || 0),
 
     sizes:
-      product.sizes || [],
+      normaliseSizes(product.sizes || []),
 
     url:
       product.url || null
@@ -45,9 +46,56 @@ function normaliseProduct(product = {}) {
 }
 
 
+function normaliseSizes(sizes = []) {
+
+  const cleaned = sizes
+    .map(size => {
+
+      const value =
+        String(size).trim();
+
+      if (!value) {
+        return null;
+      }
+
+      // Shopify sometimes returns colour without a real size
+      if (value.toLowerCase() === "no colour") {
+        return null;
+      }
+
+      // Shopify variant format:
+      // "Black / M" -> "M"
+      // "No Colour / ONE-SIZE" -> "ONE-SIZE"
+      if (value.includes(" / ")) {
+
+        const parts =
+          value.split(" / ");
+
+        return parts[
+          parts.length - 1
+        ].trim();
+      }
+
+      // AFC sizes such as:
+      // 1/2Y
+      // 5/6Y
+      // YM
+      // 10.5 - 2
+      return value;
+
+    })
+    .filter(Boolean);
+
+
+  return [...new Set(cleaned)];
+
+}
+
+
 function extractSeason(name = "") {
 
-  const match = name.match(/\d{2}\/\d{2}/);
+  const match =
+    name.match(/\d{2}\/\d{2}/);
 
   if (!match) {
     return null;
@@ -86,7 +134,8 @@ function extractKit(product = {}, name = "") {
 
 function extractProductType(name = "") {
 
-  const text = name.toLowerCase();
+  const text =
+    name.toLowerCase();
 
   if (
     text.includes("mini kit") ||
