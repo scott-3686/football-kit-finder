@@ -24,7 +24,10 @@ function normaliseProduct(product = {}) {
 
     age_group:
       product.age_group ||
-      extractAgeGroup(name),
+      extractAgeGroup(product, name),
+
+    size_type:
+      product.size_type || null,
 
     price: Number(product.price || 0),
 
@@ -122,7 +125,7 @@ function extractAgeGroup(product = {}, name = "") {
     JSON.stringify(product).toLowerCase() +
     name.toLowerCase();
 
- const sizes =
+  const sizes =
     JSON.stringify(
       product.sizes ||
       product.item_catalogue ||
@@ -154,12 +157,12 @@ function extractAgeGroup(product = {}, name = "") {
 
   // Sock size ranges are a useful AFC clue
   if (
-  sizes.includes("10.5") ||
-  sizes.includes("2.5") ||
-  sizes.includes("5.5")
-) {
-  return "Youth";
-}
+    sizes.includes("10.5") ||
+    sizes.includes("2.5") ||
+    sizes.includes("5.5")
+  ) {
+    return "Youth";
+  }
 
 
   if (text.includes("adult")) {
