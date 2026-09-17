@@ -56,7 +56,6 @@ async function fetchListing(id, subid = "") {
 }
 
 
-
 function getAgeGroup(subid) {
 
   if ([11, 100, 52].includes(subid)) {
@@ -76,7 +75,6 @@ function getAgeGroup(subid) {
 }
 
 
-
 function mapProduct(product, category, ageGroup) {
 
   const name =
@@ -85,37 +83,33 @@ function mapProduct(product, category, ageGroup) {
     "";
 
 
-  
-
-
   let productType = "Other";
 
-const lowerName = name.toLowerCase();
+  const lowerName = name.toLowerCase();
 
-if (
-  lowerName.includes("baby kit") ||
-  lowerName.includes("infant kit") ||
-  lowerName.includes("mini kit") ||
-  lowerName.includes("full kit")
-) {
-  productType = "Full Kit";
 
-} else if (lowerName.includes("jersey")) {
-  productType = "Jersey";
+  if (
+    lowerName.includes("baby kit") ||
+    lowerName.includes("infant kit") ||
+    lowerName.includes("mini kit") ||
+    lowerName.includes("full kit")
+  ) {
+    productType = "Full Kit";
 
-} else if (lowerName.includes("short")) {
-  productType = "Shorts";
+  } else if (lowerName.includes("jersey")) {
+    productType = "Shirt";
 
-} else if (lowerName.includes("sock")) {
-  productType = "Socks";
-}
+  } else if (lowerName.includes("short")) {
+    productType = "Shorts";
 
+  } else if (lowerName.includes("sock")) {
+    productType = "Socks";
+  }
 
 
   const sizes = (product.item_catalogue || [])
     .map(item => item.label)
     .filter(Boolean);
-
 
 
   let sizeType = "Unknown";
@@ -133,7 +127,6 @@ if (
   }
 
 
-
   return {
     club: "Aberdeen FC",
     kit: category,
@@ -147,7 +140,6 @@ if (
   };
 
 }
-
 
 
 async function scrape() {
