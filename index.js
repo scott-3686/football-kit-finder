@@ -9,7 +9,6 @@ const sources = JSON.parse(
 );
 
 
-
 function dedupeProducts(products) {
 
   const seen = new Map();
@@ -17,18 +16,46 @@ function dedupeProducts(products) {
 
   for (const product of products) {
 
-   const key = [
-  product.club,
-  product.name,
-  product.price
-]
-  .join("|")
-  .toLowerCase();
+    const key = [
+      product.club,
+      product.name,
+      product.price
+    ]
+      .join('|')
+      .toLowerCase();
+
+
+    const ageGroups =
+      product.age_group &&
+      product.age_group !== 'Unknown'
+        ? [product.age_group]
+        : [];
 
 
     if (!seen.has(key)) {
-      seen.set(key, product);
+
+      const cleanProduct = {
+        ...product,
+        age_groups: ageGroups
+      };
+
+      delete cleanProduct.age_group;
+
+      seen.set(key, cleanProduct);
+
+      continue;
     }
+
+
+    const existing = seen.get(key);
+
+
+    existing.age_groups = [
+      ...new Set([
+        ...existing.age_groups,
+        ...ageGroups
+      ])
+    ];
 
   }
 
@@ -36,7 +63,6 @@ function dedupeProducts(products) {
   return Array.from(seen.values());
 
 }
-
 
 
 async function run() {
