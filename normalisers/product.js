@@ -33,8 +33,8 @@ function normaliseProduct(product = {}) {
       product.age_group ||
       extractAgeGroup(product, name),
 
-    age_range:
-      extractAgeRange(sizes),
+    age_ranges:
+      extractAgeRanges(sizes),
 
     size_type:
       product.size_type || null,
@@ -88,7 +88,7 @@ function normaliseSizes(sizes = []) {
 }
 
 
-function extractAgeRange(sizes = []) {
+function extractAgeRanges(sizes = []) {
 
   const ranges = [];
 
@@ -101,46 +101,42 @@ function extractAgeRange(sizes = []) {
         .toUpperCase();
 
 
-    // Months: 3/6M, 6/9M, 9/12M
     const monthMatch =
       value.match(/^(\d+)\s*\/\s*(\d+)M$/);
 
     if (monthMatch) {
+
       ranges.push({
-        min: Number(monthMatch[1]),
-        max: Number(monthMatch[2])
+        label: size,
+        min_months:
+          Number(monthMatch[1]),
+        max_months:
+          Number(monthMatch[2])
       });
 
       continue;
     }
 
 
-    // Years: 1/2Y, 3/4Y, 5/6Y
     const yearMatch =
       value.match(/^(\d+)\s*\/\s*(\d+)Y$/);
 
     if (yearMatch) {
+
       ranges.push({
-        min: Number(yearMatch[1]) * 12,
-        max: Number(yearMatch[2]) * 12
+        label: size,
+        min_months:
+          Number(yearMatch[1]) * 12,
+        max_months:
+          Number(yearMatch[2]) * 12
       });
+
     }
 
   }
 
 
-  if (!ranges.length) {
-    return null;
-  }
-
-
-  return {
-    min_months:
-      Math.min(...ranges.map(range => range.min)),
-
-    max_months:
-      Math.max(...ranges.map(range => range.max))
-  };
+  return ranges;
 
 }
 

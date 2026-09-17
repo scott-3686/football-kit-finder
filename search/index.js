@@ -40,19 +40,25 @@ function searchProducts(products = [], filters = {}) {
         Number(filters.age) * 12;
 
       if (
-        !product.age_range ||
-        product.age_range.min_months === undefined ||
-        product.age_range.max_months === undefined
+        !Array.isArray(product.age_ranges) ||
+        !product.age_ranges.length
       ) {
         return false;
       }
 
-      if (
-        ageInMonths <
-          product.age_range.min_months ||
-        ageInMonths >
-          product.age_range.max_months
-      ) {
+
+      const ageMatches =
+        product.age_ranges.some(range => {
+
+          return (
+            ageInMonths >= range.min_months &&
+            ageInMonths <= range.max_months
+          );
+
+        });
+
+
+      if (!ageMatches) {
         return false;
       }
 
