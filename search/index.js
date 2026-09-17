@@ -4,7 +4,10 @@ function searchProducts(products = [], filters = {}) {
 
     if (
       filters.club &&
-      !matchesText(product.club, filters.club)
+      !matchesPartialText(
+        product.club,
+        filters.club
+      )
     ) {
       return false;
     }
@@ -12,7 +15,10 @@ function searchProducts(products = [], filters = {}) {
 
     if (
       filters.product &&
-      !matchesText(product.product, filters.product)
+      !matchesText(
+        product.product,
+        filters.product
+      )
     ) {
       return false;
     }
@@ -20,7 +26,10 @@ function searchProducts(products = [], filters = {}) {
 
     if (
       filters.kit &&
-      !matchesText(product.kit, filters.kit)
+      !matchesText(
+        product.kit,
+        filters.kit
+      )
     ) {
       return false;
     }
@@ -28,7 +37,8 @@ function searchProducts(products = [], filters = {}) {
 
     if (
       filters.maxPrice !== undefined &&
-      Number(product.price) > Number(filters.maxPrice)
+      Number(product.price) >
+        Number(filters.maxPrice)
     ) {
       return false;
     }
@@ -38,6 +48,7 @@ function searchProducts(products = [], filters = {}) {
 
       const ageInMonths =
         Number(filters.age) * 12;
+
 
       if (
         !Array.isArray(product.age_ranges) ||
@@ -51,8 +62,10 @@ function searchProducts(products = [], filters = {}) {
         product.age_ranges.some(range => {
 
           return (
-            ageInMonths >= range.min_months &&
-            ageInMonths <= range.max_months
+            ageInMonths >=
+              range.min_months &&
+            ageInMonths <=
+              range.max_months
           );
 
         });
@@ -72,11 +85,15 @@ function searchProducts(products = [], filters = {}) {
 }
 
 
-function matchesText(value, searchValue) {
+function matchesText(
+  value,
+  searchValue
+) {
 
   if (!value) {
     return false;
   }
+
 
   return (
     String(value)
@@ -86,6 +103,28 @@ function matchesText(value, searchValue) {
       .trim()
       .toLowerCase()
   );
+
+}
+
+
+function matchesPartialText(
+  value,
+  searchValue
+) {
+
+  if (!value) {
+    return false;
+  }
+
+
+  return String(value)
+    .trim()
+    .toLowerCase()
+    .includes(
+      String(searchValue)
+        .trim()
+        .toLowerCase()
+    );
 
 }
 
