@@ -11,6 +11,7 @@ class Product {
     sizes,
     variants,
     source,
+    sourceProductId,
     kitType,
     productCategory,
     ageRange
@@ -26,9 +27,10 @@ class Product {
     this.sizes = sizes;
     this.variants = variants;
     this.source = source;
+    this.sourceProductId = sourceProductId;
     this.kitType = kitType;
     this.productCategory = productCategory;
-    this.ageRange = ageRange
+    this.ageRange = ageRange;
   }
 }
 

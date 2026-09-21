@@ -8,5 +8,42 @@
     "name": "Aberdeen",
     "platform": "afc",
     "url": "https://shop.afc.co.uk"
+  },
+  {
+    "name": "Dundee United",
+    "platform": "dundee_united",
+    "url": "https://shop.dundeeunitedfc.co.uk",
+    "listing": "/browse/c-Replica-14/?view_all=true"
+  },
+  {
+    "name": "Livingston",
+    "platform": "woocommerce",
+    "url": "https://livingstonfcdirect.co.uk",
+    "size_age_map": {
+      "6XS": {
+        "min": 4,
+        "max": 5
+      },
+      "5XS": {
+        "min": 5,
+        "max": 6
+      },
+      "4XS": {
+        "min": 7,
+        "max": 8
+      },
+      "3XS": {
+        "min": 9,
+        "max": 10
+      },
+      "2XS": {
+        "min": 11,
+        "max": 12
+      },
+      "XS": {
+        "min": 12,
+        "max": 14
+      }
+    }
   }
 ]
