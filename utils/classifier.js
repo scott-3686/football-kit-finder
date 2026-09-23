@@ -1,93 +1,111 @@
-function getKitType(title) {
+function getKitType(title = '') {
+  const text =
+    title.toLowerCase();
 
-  const text = title.toLowerCase();
 
-  const isKitProduct =
-    text.includes('shirt') ||
-    text.includes('jersey') ||
-    text.includes('top') ||
-    text.includes('short');
-
-  if (!isKitProduct) {
-    return null;
+  if (
+    text.includes('goalkeeper') ||
+    /\bgk\b/.test(text)
+  ) {
+    return 'goalkeeper';
   }
+
 
   if (text.includes('home')) {
     return 'home';
   }
 
+
   if (text.includes('away')) {
     return 'away';
   }
+
 
   if (text.includes('third')) {
     return 'third';
   }
 
+
   return null;
 }
 
 
-function getProductCategory(title) {
+function getProductCategory(
+  title = ''
+) {
+  const text =
+    title.toLowerCase();
 
-  const text = title.toLowerCase();
 
   if (
-    text.includes('shirt') ||
+    text.includes('mini kit') ||
+    text.includes('infant kit') ||
+    text.includes('baby kit') ||
+    text.includes('full kit') ||
+    text.includes('kit set')
+  ) {
+    return 'full kit';
+  }
+
+
+  if (
     text.includes('jersey') ||
-    text.includes('top')
+    text.includes('shirt')
   ) {
     return 'shirt';
   }
 
-  if (text.includes('short')) {
+
+  if (
+    text.includes('short')
+  ) {
     return 'shorts';
   }
 
-  if (text.includes('sock')) {
+
+  if (
+    text.includes('sock')
+  ) {
     return 'socks';
   }
 
-  if (
-    text.includes('training') ||
-    text.includes('quarter zip') ||
-    text.includes('1/4 zip')
-  ) {
-    return 'training';
-  }
-
-  if (
-    text.includes('hoodie') ||
-    text.includes('jacket') ||
-    text.includes('coat')
-  ) {
-    return 'leisure';
-  }
 
   return 'other';
 }
 
 
-function getAgeRange(title) {
+function getAgeRange(title = '') {
+  const text =
+    title.toLowerCase();
 
-  const text = title.toLowerCase();
 
-  const match = text.match(
-    /(\d+)[\s-]*(?:to|-)[\s-]*(\d+)/
-  );
+  const yearRange =
+    text.match(
+      /(\d+)\s*(?:-|\/|to)\s*(\d+)\s*(?:y|yr|yrs|year|years)\b/i
+    );
 
-  if (match) {
+
+  if (yearRange) {
     return {
-      min: Number(match[1]),
-      max: Number(match[2])
+      min:
+        Number(
+          yearRange[1]
+        ),
+
+      max:
+        Number(
+          yearRange[2]
+        )
     };
   }
+
 
   if (
     text.includes('jnr') ||
     text.includes('junior') ||
     text.includes('kids') ||
-    text.includes('youth')
+    text.includes('youth') ||
+    text.includes('child')
   ) {
     return {
       min: null,
@@ -95,70 +113,146 @@ function getAgeRange(title) {
     };
   }
 
+
   return null;
 }
 
 
-function getVariantAgeRange(variants = []) {
-
+function getVariantAgeRange(
+  variants = []
+) {
   const ages = [];
 
-  variants.forEach(variant => {
 
-    const match = variant.title.match(
-      /(\d+)[\s-]*(?:to|-)[\s-]*(\d+)\s*Years?/i
-    );
+  for (
+    const variant
+    of variants
+  ) {
+    const title =
+      String(
+        variant.title || ''
+      );
 
-    if (match) {
+
+    const range =
+      title.match(
+        /(\d+)\s*(?:-|\/|to)\s*(\d+)\s*(?:y|yr|yrs|year|years)\b/i
+      );
+
+
+    if (range) {
       ages.push({
-        min: Number(match[1]),
-        max: Number(match[2])
+        min:
+          Number(
+            range[1]
+          ),
+
+        max:
+          Number(
+            range[2]
+          )
       });
+
+      continue;
     }
 
-  });
+
+    const singleAge =
+      title.match(
+        /\b(\d+)\s*(?:y|yr|yrs|year|years)\b/i
+      );
+
+
+    if (singleAge) {
+      const age =
+        Number(
+          singleAge[1]
+        );
+
+
+      ages.push({
+        min: age,
+        max: age
+      });
+    }
+  }
+
 
   if (!ages.length) {
     return null;
   }
 
+
   return {
-    min: Math.min(...ages.map(a => a.min)),
-    max: Math.max(...ages.map(a => a.max))
+    min:
+      Math.min(
+        ...ages.map(
+          age => age.min
+        )
+      ),
+
+    max:
+      Math.max(
+        ...ages.map(
+          age => age.max
+        )
+      )
   };
 }
 
-module.exports = {
-  getKitType,
-  getProductCategory,
-  getAgeRange,
-  getVariantAgeRange
-};
-function getAgeGroup(title, variants = []) {
 
-  const text = title.toLowerCase();
+function getAgeGroup(
+  title = '',
+  variants = []
+) {
+  const text =
+    title.toLowerCase();
+
+
+  if (
+    text.includes('baby') ||
+    text.includes('infant') ||
+    text.includes('toddler') ||
+    text.includes('mini kit')
+  ) {
+    return 'baby / infant';
+  }
+
 
   if (
     text.includes('jnr') ||
     text.includes('junior') ||
     text.includes('kids') ||
-    text.includes('youth')
+    text.includes('youth') ||
+    text.includes('child')
   ) {
     return 'junior';
   }
 
-  const hasJuniorSizes = variants.some(v =>
-    ['3xs', 'xxs', 'xs'].some(size =>
-      v.title.toLowerCase().includes(size)
-    )
-  );
 
-  if (hasJuniorSizes) {
+  const variantText =
+    variants
+      .map(
+        variant =>
+          variant.title || ''
+      )
+      .join(' ')
+      .toLowerCase();
+
+
+  if (
+    /\b\d+\s*(?:-|\/|to)\s*\d+\s*(?:y|yr|yrs|year|years)\b/i
+      .test(variantText) ||
+    /\b\d+\s*(?:yr|yrs|year|years)\b/i
+      .test(variantText)
+  ) {
     return 'junior';
   }
 
+
   return 'adult';
 }
+
 
 module.exports = {
   getKitType,
